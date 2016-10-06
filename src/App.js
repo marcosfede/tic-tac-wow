@@ -1,219 +1,166 @@
 import React, { Component } from 'react'
+//import $ from 'jquery'
+
+import { Card, CardText } from 'material-ui/Card'
+import RaisedButton from 'material-ui/RaisedButton';
+
 import './App.css'
 import Topbar from './components/Topbar'
-import Controls from './components/Controls.js'
-import { Card, CardActions, CardText } from 'material-ui/Card'
-import FlatButton from 'material-ui/FlatButton'
-let $ = require("expose?$!jquery");
-require("./FlipClock/flipclock")
-const styles = {
-  App: {
-  }
-}
+import Tile from './components/Tile'
 
-class App extends Component {
+export default class App extends Component {
 
   constructor () {
     super()
-    let defaults = {
-      sessionTime: 30,
-      breakTime: 5,
-    }
     this.state = {
-      status: 'stopped',
-      currentBlock: 'session',
-      expanded: false,
-      sessionTime: defaults.sessionTime,
-      breakTime: defaults.breakTime,
-      timer: defaults.sessionTime,
-      toggledSound: true,
-      toggledNotifications: true,
-      toggledRepeat: false,
-      toggledPause: false,
+      faction: null,
+      tiles : Array(9).fill(''),
+      playerTurn: null,
+      gameOver: false,
     }
   }
 
   componentDidMount () {
-    if (Notification.permission !== 'granted') {
-      Notification.requestPermission()
-    }
-    this.initCounter()
-    $('#text').slideDown(500)
-    $('#slide').slideUp(500)
-
   }
-
-  initCounter = () => {
-    window.clock = $('.countdown').FlipClock(this.state.timer*60, {
-      clockFace: 'MinuteCounter',
-      countdown: true,
-      autoStart: false,
-      onStart: function () {
-      },
-      onStop: () => {
-        if (window.clock.getFaceValue() === 0) {
-          this.timerReached0()
-        }
-      }
-    }).setCountdown(true).stop().reset()
-  }
-
-  timerReached0 = () => {
-    // if in session, go to a break
-    if (this.state.currentBlock === 'session') {
-      this.setState({currentBlock: 'break'})
-      this.playSound()
-      this.showNotification()
-      window.clock.setFaceValue(this.state.breakTime*60)
-      if (this.state.toggledPause){
-        this.setState({status: 'paused'})
-      }
-      else {
-        window.clock.start()
-      }
-    }
-    // if in break and repeat, loop to session again
-    else if (this.state.currentBlock === 'break') {
-      this.setState({currentBlock: 'session'})
-      this.playSound()
-      this.showNotification()
-      if (this.state.toggledRepeat) {
-        window.clock.setFaceValue(this.state.sessionTime*60).start()
-        // reset the clock and stop
-      }else {
-        this.setState({status: 'stopped'})
-        window.clock.setFaceValue(this.state.sessionTime*60)
-      }
-    }
-  }
-
-  playPause = () => {
-    if (this.state.status === 'stopped') {
-      this.setState({status: 'running'})
-      window.clock.setFaceValue(this.state.sessionTime*60).start()
-    }
-    else if (this.state.status === 'paused') {
-      this.setState({status: 'running'})
-      window.clock.start()
-    }else {
-      this.setState({status: 'paused'})
-      window.clock.stop()
-    }
-  }
-  resetTimer = () => {
-    this.setState({currentBlock: 'session', status: 'stopped'})
-    window.clock.stop()
-    window.clock.setFaceValue(this.state.sessionTime*60)
-  }
-  playSound = () => {
-    if (this.state.toggledSound) {
-      let audio = new Audio('https://mca62511.github.io/pomodoro/audio/ding.mp3')
-      audio.play()
-    }
-  }
-  showNotification = () => {
-    if (this.state.toggledNotifications) {
-      if (Notification.permission !== 'granted') {
-        Notification.requestPermission()}else {
-        var notification = new Notification('Time is up!', {
-          icon: 'https://cdn0.iconfinder.com/data/icons/feather/96/clock-128.png',
-          body: this.state.currentBlock === 'session' ? 'Back to work' : 'Take a break'
-        })
-        notification.onclick = function () {
-          window.open('#')
-        }
-      }
-    }
-  }
-  handleSound = (event, toggle) => this.setState({ toggledSound: toggle})
-  handleNotifications = (event, toggle) => this.setState({ toggledNotifications: toggle})
-  handleRepeat = (event, toggle) => this.setState({ toggledRepeat: toggle})
-  handlePause = (event, toggle) => this.setState({ toggledPause: toggle})
-  handleFormSession = (event, value) => {
-    this.setState({sessionTime: value})
-  }
-  handleFormBreak = (event,value) => {
-    this.setState({breakTime: value})
-  }
-
-  increaseSession = () => {
-    let newtime = this.state.sessionTime +1
-    if (newtime<=60) this.setState({sessionTime: newtime})
-  }
-  decreaseSession = () => {
-    let newtime = this.state.sessionTime -1
-    if(newtime>=0) this.setState({sessionTime: newtime})
-  }
-  increaseBreak = () => {
-    let newtime = this.state.breakTime +1
-    if (newtime <= 40) this.setState({breakTime: newtime})
-  }
-  decreaseBreak= () => {
-    let newtime = this.state.breakTime -1
-    if(newtime>=0) this.setState({breakTime: newtime})
-  }
-
 
   render () {
-    let renderText = () => {
-      if (this.state.status === 'running') {
-        $('#text').slideUp(500)
-        $('#slide').slideDown(500)
-        if (this.state.currentBlock === 'session'){
-          return 'Focus Time!'
-        }
-        else if (this.state.currentBlock === 'break'){
-          return 'You deserve a break'
-        }
-      }
-      else {
-        $('#text').slideDown(500)
-        $('#slide').slideUp(500)
-      }
-    }
+
     return (
-      <div style={styles} id='App' className='App'>
-        <Topbar/>
+      <div id='App' className='App'>
+        <Topbar
+          href={'https://github.com/marcosfede/tic-tac-toe'}
+          title={'Tic Tac Wow'}
+        />
         <div id='content'>
           <Card id='card' zDepth={2}>
-            <CardText id='timer'>
-              <div className='countdown-wrapper'>
-                <div className='countdown flip-clock-wrapper'>
-                </div>
-              </div>
+            <CardText id='title'>
+              <p>Tic Tac Wow</p>
             </CardText>
-            <div id="slide">
-              {renderText()}
+            <div id="status-buttons">
+                {this.renderFactionOrReset()}
             </div>
-            <Controls
-              sessionTime={this.state.sessionTime}
-              breakTime={this.state.breakTime}
-              decreaseSession={this.decreaseSession}
-              increaseSession={this.increaseSession}
-              decreaseBreak={this.decreaseBreak}
-              increaseBreak={this.increaseBreak}
-              toggledSound={this.state.toggledSound}
-              toggledNotifications={this.state.toggledNotifications}
-              toggledRepeat={this.state.toggledRepeat}
-              toggledPause={this.state.toggledPause}
-              handleSound={this.handleSound}
-              handleNotifications={this.handleNotifications}
-              handleFormSession={this.handleFormSession}
-              handleFormBreak={this.handleFormBreak}
-              handleRepeat={this.handleRepeat}
-              handlePause={this.handlePause} />
-            <CardActions>
-              <FlatButton
-                label={this.state.status === 'running' ? 'Pause'
-                  : this.state.status === 'paused' ? 'continue'
-                  : 'Start'} onClick={this.playPause} />
-              <FlatButton label='Reset' onClick={this.resetTimer} />
-            </CardActions>
+            <div id="game">
+              {this.renderTiles()}
+            </div>
           </Card>
         </div>
       </div>
     )
   }
-}
+  renderTiles = () => {
+    let {tiles} = this.state
+    return tiles.map((tile, index) => {
+              return <Tile
+                      key={index}
+                      position={index}
+                      value={tile}
+                      tileClick={this.tileClick}
+                      />
+            })
+  }
 
-export default App
+  renderFactionOrReset = () => {
+    if (!this.state.faction) {
+      // $('#text').slideUp(500)
+      // $('#slide').slideDown(500)
+      return (
+        <div>
+        <p> Pick a Faction </p>
+        <span>
+          <RaisedButton label="Alliance"
+            onClick={() => this.startGame('Alliance')}  />
+          <RaisedButton label="Horde"
+            onClick={() => this.startGame('Horde')} />
+        </span>
+        </div>
+      )
+    }
+    else {
+      return (
+        <RaisedButton label="Reset" onClick={this.resetGame} />
+      )
+    }
+  }
+
+  startGame = (faction) => {
+    this.setState({faction: faction, playerTurn: faction === "Alliance" ? true : false},
+    // AI's turn if player selected Horde
+    () => {if (faction === 'Horde') {this.AIMove()} }
+    )
+  }
+
+  resetGame = () => {
+    this.setState({faction: null, playerTurn: null, tiles: Array(9).fill('')})
+  }
+
+  tileClick = (position) => {
+    let {playerTurn, tiles, faction} = this.state
+    if (faction !== null && playerTurn && tiles[position]===''){
+      let newTiles = [
+        ...tiles.slice(0,position),
+        faction,
+        ...tiles.slice(position+1)
+      ]
+      this.setState({playerTurn: false, tiles: newTiles },
+      () => this.AIMove())
+    }
+  }
+
+  gameFinish = () => {
+    window.setTimeout(() => this.setState({
+      playerTurn: null,
+      faction: null,
+      tiles: Array(9).fill('')
+    }),1000)
+  }
+
+  AIMove = () => {
+    let {tiles, faction} = this.state
+    let AIFaction = faction === 'Alliance' ? 'Horde' : 'Alliance'
+    let emptyTilePositions = tiles.reduce( (prev,curr,index) => {
+      if (curr==='') return prev.concat(index)
+      else return prev
+    },[])
+    if (emptyTilePositions.length >= 1) {
+      // some worker code
+      let AITile = emptyTilePositions[Math.floor(Math.random()*emptyTilePositions.length)]
+      let AITile = minimax(tiles, emptyTilePositions)
+      this.setState({
+        tiles: [
+          ...tiles.slice(0,AITile),
+          AIFaction,
+          ...tiles.slice(AITile+1)
+        ],
+      })
+      this.checkBoardState(emptyTilePositions)
+    }
+    // There are no empty tiles. game must end
+    else {
+      // game over
+      this.setState({
+        gameOver: true,
+      },this.gameFinish)
+    }
+  }
+  checkBoardState = (emptyTilePositions) => {
+    // only one option, after choosing it the game ends
+    if (emptyTilePositions.length === 1){
+      // check who won
+      //
+      this.setState({gameOver: true}, this.gameFinish)
+    }
+    else {
+      // game continues
+      this.setState({playerTurn: true})
+    }
+  }
+  minimax = (tiles, emptyTilePositions) => {
+
+  }
+  getAvailableMoves = (tiles) => {
+    return tiles.reduce( (prev,curr,index) => {
+      if (curr==='') return prev.concat(index)
+      else return prev
+    },[])
+  }
+}

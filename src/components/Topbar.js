@@ -19,11 +19,11 @@ const styles = {
 const AppBarExampleIconButton = (props) => (
   <AppBar
     style={styles.bar}
-    title={<span style={styles.title}>Pomodoro Clock</span>}
+    title={<span style={styles.title}>{props.title}</span>}
     iconElementLeft={<div></div>}
     iconElementRight={
       <FlatButton
-        href='https://github.com/marcosfede/pomodoro-clock'
+        href={props.href}
         secondary={true}
         icon={<FontIcon className='fa fa-github' hoverColor="#55486E" />}
         style={styles.github}
