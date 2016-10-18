@@ -26,7 +26,7 @@ export default class App extends Component {
     return (
       <div id='App' className='App'>
         <Topbar
-          href={'https://github.com/marcosfede/tic-tac-toe'}
+          href={'https://github.com/marcosfede/tic-tac-wow'}
           title={'Tic Tac Wow'}
         />
         <div id='content'>
