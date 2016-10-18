@@ -1,5 +1,6 @@
 import React, {Component} from 'react'
-
+import allianceimg from '../images/alliance.png'
+import hordeimg from '../images/horde.gif'
 
 let styles = {
   tile : {
@@ -25,8 +26,8 @@ export default class Tile extends Component {
     )
   }
   renderImage = (value) => {
-    if (value === 'a') return <img alt="Alliance" style={{height: '120px'}} src="../images/alliance.png" />
-    else if (value === 'h') return <img alt="Horde" style={{height: '120px'}} src="../images/horde.gif" />
+    if (value === 'a') return <img alt="Alliance" style={{height: '120px'}} src={allianceimg} />
+    else if (value === 'h') return <img alt="Horde" style={{height: '120px'}} src={hordeimg} />
     else return
   }
 }

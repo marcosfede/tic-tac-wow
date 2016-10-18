@@ -4,6 +4,7 @@
   "private": true,
   "devDependencies": {
     "gh-pages": "^0.11.0",
+    "image-webpack-loader": "^3.0.0",
     "imports-loader": "^0.6.5",
     "react-scripts": "0.2.2",
     "standard": "^8.0.0"
