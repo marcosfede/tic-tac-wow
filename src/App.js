@@ -82,13 +82,10 @@ export default class App extends Component {
   }
 
   startGame = (faction) => {
-    let oppositeFactionDict = {
-      'a': 'h',
-      'h': 'a'
-    }
-    this.setState({faction: faction, AIFaction: oppositeFactionDict[faction], playerTurn: faction === "a" ? true : false},
+    let oppositeFactionDict = { 'a': 'h', 'h': 'a' }
+    this.setState({faction: faction, AIFaction: oppositeFactionDict[faction], playerTurn: faction === "a"},
     // AI's turn if player selected Horde
-    () => {if (faction === 'h') {this.AIMove()} }
+      () => {if (faction === 'h') {this.AIMove()} }
     )
   }
 
@@ -99,14 +96,12 @@ export default class App extends Component {
   tileClick = (position) => {
     let {playerTurn, tiles, faction} = this.state
     if (faction !== null && playerTurn && tiles[position]===''){
-      let initial = faction === 'a' ? 'a' : 'h'
       let newTiles = [
         ...tiles.slice(0,position),
-        initial,
+        faction,
         ...tiles.slice(position+1)
       ]
-      this.setState({playerTurn: false, tiles: newTiles },
-      () => this.AIMove())
+      this.setState({playerTurn: false, tiles: newTiles }, this.AIMove)
     }
   }
 
