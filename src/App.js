@@ -89,10 +89,6 @@ export default class App extends Component {
     )
   }
 
-  resetGame = () => {
-    this.setState({faction: null, AIFaction: null, playerTurn: null, tiles: Array(9).fill('')})
-  }
-
   tileClick = (position) => {
     let {playerTurn, tiles, faction} = this.state
     if (faction !== null && playerTurn && tiles[position]===''){
@@ -101,21 +97,39 @@ export default class App extends Component {
         faction,
         ...tiles.slice(position+1)
       ]
-      this.setState({playerTurn: false, tiles: newTiles }, this.AIMove)
+      this.setState({playerTurn: false, tiles: newTiles }, this.checkWinnerOrContinue)
     }
   }
 
+  resetGame = () => {
+    this.setState({faction: null, AIFaction: null, playerTurn: null, tiles: Array(9).fill('')})
+  }
+
   gameFinish = () => {
-    window.setTimeout(() => this.setState({
-      playerTurn: null,
-      faction: null,
-      tiles: Array(9).fill('')
-    }),1000)
+    window.setTimeout(this.resetGame,1000)
+  }
+  // checks if the game is over. if its not, invokes AI if playerTurn is false
+  checkWinnerOrContinue = () => {
+    let {tiles, AIFaction, faction, playerTurn} = this.state
+    let {checkWinner, gameFinish, AIMove} = this
+
+    let winner = checkWinner(tiles)
+    switch (winner) {
+      case faction:
+      case AIFaction:
+      case 'd':
+        this.setState({gameOver: true}, gameFinish)
+        break;
+      default:
+        if (!playerTurn) {
+          AIMove()
+        }
+    }
   }
 
   AIMove = () => {
     let {tiles, AIFaction, faction} = this.state
-    let {minimax, checkBoardState} = this
+    let {minimax, checkBoardState, checkWinnerOrContinue} = this
 
     let AITile = minimax(tiles, true).move
     let newTiles = [
@@ -123,23 +137,16 @@ export default class App extends Component {
         AIFaction,
         ...tiles.slice(AITile+1)
       ]
-    this.setState({ tiles: newTiles },
-    checkBoardState(newTiles, faction, AIFaction))
+    this.setState({ tiles: newTiles , playerTurn: true},
+    checkWinnerOrContinue)
   }
 
-  checkBoardState = (tiles, faction, AIFaction) => {
-      let winner = this.checkWinner(tiles)
-      switch (winner) {
-        case faction:
-        case AIFaction:
-        case 'd':
-          this.setState({gameOver: true}, this.gameFinish)
-          break;
-        default:
-          this.setState({playerTurn: true})
-      }
-  }
 
+  /* main minmax algorithm.
+  * @param tiles: board state at a certain recursion level
+  * @param aiTurn : alternates between true and false, begins at true
+  * @return object {score: scorevalue , move: whereshould ai play}
+  */
   minimax = (tiles, aiTurn) => {
     /* check if game is over, return 1, -1 or 0
     if not over, getAvailableMoves
@@ -169,18 +176,19 @@ export default class App extends Component {
         else { return {score: minScore, move: minScoreMove} }
     }
   }
-
+  // returns all the empty indexes where a move can be made
   getAvailableMoves = (tiles) => {
     return tiles.reduce( (prev,curr,index) => curr==='' ?
     prev.concat(index) : prev ,[])
   }
-
+  // simulates a movement used in the minmax recursion. does not modify the tiles
   virtualMove = (tiles, move, aiTurn) => {
     let _tiles = [...tiles]
     _tiles[move] = aiTurn ? this.state.AIFaction : this.state.faction
     return _tiles
   }
-
+  // @param tiles : board configuration array
+  // returns  winner (a, h) , draw (d) or none (n)
   checkWinner = (tiles) => {
     let t = tiles
     // return 1, -1 , d or n if not done.
@@ -199,8 +207,8 @@ export default class App extends Component {
     if (check(t[2], t[4], t[6])) return t[2]
 
     // if no match the string length of the array will be nice in which case return d as a draw
-    if (t.join('').length === 9) return ['d']
-    return ['n']
+    if (t.join('').length === 9) return 'd'
+    return 'n'
   }
 
 }
