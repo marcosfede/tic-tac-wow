@@ -70,11 +70,11 @@ export default class App extends Component {
         <p> Pick a Faction </p>
         <span>
           <RaisedButton label="Alliance"
-            style={{width: "130px"}}
+            style={{width: "130px", marginRight: '4px'}}
             icon={<img alt="Alliance" style={{height: '25px'}} src={allianceimg}/>}
             onClick={() => this.startGame('a')}  />
           <RaisedButton label="Horde"
-            style={{width: "130px"}}
+            style={{width: "130px", marginLeft: '4px'}}
             icon={<img alt="Alliance" style={{height: '25px'}} src={hordeimg}/>}
             onClick={() => this.startGame('h')} />
         </span>
@@ -135,8 +135,8 @@ export default class App extends Component {
   }
 
   AIMove = () => {
-    let {tiles, AIFaction, faction} = this.state
-    let {minimax, checkBoardState, checkWinnerOrContinue} = this
+    let {tiles, AIFaction} = this.state
+    let {minimax, checkWinnerOrContinue} = this
 
     let AITile = minimax(tiles, true).move
     let newTiles = [
