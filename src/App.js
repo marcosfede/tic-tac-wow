@@ -8,6 +8,9 @@ import './App.css'
 import Topbar from './components/Topbar'
 import Tile from './components/Tile'
 
+import allianceimg from './images/alliance.png'
+import hordeimg from './images/horde.gif'
+
 export default class App extends Component {
 
   constructor () {
@@ -32,7 +35,7 @@ export default class App extends Component {
         <div id='content'>
           <Card id='card' zDepth={2}>
             <CardText id='title'>
-              <p>Tic Tac Wow</p>
+              Tic Tac Wow
             </CardText>
             <div id="status-buttons">
                 {this.renderFactionOrReset()}
@@ -67,8 +70,12 @@ export default class App extends Component {
         <p> Pick a Faction </p>
         <span>
           <RaisedButton label="Alliance"
+            style={{width: "130px"}}
+            icon={<img alt="Alliance" style={{height: '25px'}} src={allianceimg}/>}
             onClick={() => this.startGame('a')}  />
           <RaisedButton label="Horde"
+            style={{width: "130px"}}
+            icon={<img alt="Alliance" style={{height: '25px'}} src={hordeimg}/>}
             onClick={() => this.startGame('h')} />
         </span>
         </div>

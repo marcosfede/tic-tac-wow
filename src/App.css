@@ -1,4 +1,7 @@
-
+@font-face {
+    src : url(fonts/LifeCraft_Font.ttf);
+    font-family: LifeCraft;
+}
 #App {
     height: 100%;
 }
@@ -27,6 +30,9 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 10px;
+  margin-top: 10px;
+  font-family: LifeCraft;
+  font-size: 4em !important;
 }
 #status-buttons {
   display: flex;
